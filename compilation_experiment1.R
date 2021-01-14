@@ -302,14 +302,14 @@ windows() ; hist(mod$res)
 windows() ; qqnorm(mod$res, main=paste("transformation log")) ; qqline(mod$res)
 shapiro.test(mod$res)
 
-# Anova and Shapiro test Puissance transformation (see with Fran?ois Bonnot)
+# Anova and Shapiro test power transformation (see with Francois Bonnot)
 mod <- lm(surface^0.5~construct+construct:rep,data=df4)
 anova(mod)
 windows() ; hist(mod$res)
-windows() ; qqnorm(mod$res, main=paste("Puissance transformation")) ; qqline(mod$res)
+windows() ; qqnorm(mod$res, main=paste("power transformation")) ; qqline(mod$res)
 shapiro.test(mod$res)
 
-# Multiple comparisons AOV test for construct (choose between No transformation, Log transformation or Puissance transformation)
+# Multiple comparisons AOV test for construct (choose between No transformation, Log transformation or power transformation)
 #mod <- aov(surface~construct+construct:rep,data=df4)
 #mod <- aov(log(surface)~construct+construct:rep,data=df4)
 mod <- aov(surface^0.5~construct+construct:rep,data=df4)
@@ -317,7 +317,7 @@ mod <- aov(surface^0.5~construct+construct:rep,data=df4)
 # Tukey HSD test and grouping for "construct"
 TukeyHSD.group.FUN(mod,"construct", FUN=function(x)x^2)
 
-# Multiple comparisons AOV test for construct.rep (choose between No transformation, Log transformation or Puissance transformation)
+# Multiple comparisons AOV test for construct.rep (choose between No transformation, Log transformation or power transformation)
 #mod <- aov(surface~construct.rep,data=df4)
 #mod <- aov(log(surface)~construct.rep,data=df4)
 mod <- aov(surface^0.5~construct.rep,data=df4)
@@ -327,10 +327,33 @@ anova(mod)
 TukeyHSD.group.FUN(mod,"construct.rep",hole.rm=TRUE, FUN=function(x)x^2)
 
 
-## --------------- FIN Comparaisons multiples ------------------
 
-## ----La suite du fichier contient des tests optionnels ----------------------------------------------------
-## --- Calcul de la transformation puissance donnant la valeur extr?mes des tests de Shapiro ou Bartlett ----
+
+# extract p.adj values for "construct" to csv file
+mod <- aov(surface^0.5~construct,data=df4)
+anova(mod)
+mt <- model.tables(mod,type="means",cterms="construct")
+tuk <- TukeyHSD(mod,"construct",ordered=FALSE)
+res <- data.frame(tuk$"construct")
+res["p.adj"]
+write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+## --------------- End of multiple comparisons ------------------
+
+## ----Optional tests ----------------------------------------------------
+
 shapiro <- function(lambda) {
   mod <- lm(surface^lambda~construct+construct:rep,data=df4)
   shapiro.test(mod$res)$stat
@@ -368,7 +391,7 @@ plot(x,b,type='l')
 (lambda <- x[b==min(b)])
 abline(v=lambda)
 
-## ------------- Fin de fichier ------------------------------------------------------------------------------
+## ------------- end of file ------------------------------------------------------------------------------
 
 
 
