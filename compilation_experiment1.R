@@ -221,6 +221,8 @@ trans <- function(x) x # No transformation (raw data)
 # trans <- function(x) x^0.5 # Power Transformation
 # trans <- log10 # Log Transformation
 
+
+
 # Create Boxplot labels
 labels <- c(5000, 10000, 15000, 20000, 25000, 30000)
 
@@ -339,6 +341,18 @@ res["p.adj"]
 write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
 
 
+# If transformation applied, export p-values for transformed values to csv file
+if (all(df4$surface == trans(df4$surface)) != TRUE) {
+  print("export adjusted p-values for transformed data")
+  mod <- aov(trans(surface)^0.5~construct,data=df4)
+  anova(mod)
+  mt <- model.tables(mod,type="means",cterms="construct")
+  tuk <- TukeyHSD(mod,"construct",ordered=FALSE)
+  res <- data.frame(tuk$"construct")
+  res["p.adj"]
+  write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_trans.csv"))
+  
+}
 
 
 
