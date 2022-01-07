@@ -223,6 +223,7 @@ trans <- function(x) x # No transformation (raw data)
 
 
 
+
 # Create Boxplot labels
 labels <- c(5000, 10000, 15000, 20000, 25000, 30000)
 
@@ -311,60 +312,80 @@ windows() ; hist(mod$res)
 windows() ; qqnorm(mod$res, main=paste("power transformation")) ; qqline(mod$res)
 shapiro.test(mod$res)
 
-# Multiple comparisons AOV test for construct (choose between No transformation, Log transformation or power transformation)
-#mod <- aov(surface~construct+construct:rep,data=df4)
-#mod <- aov(log(surface)~construct+construct:rep,data=df4)
-mod <- aov(surface^0.5~construct+construct:rep,data=df4)
 
-# Tukey HSD test and grouping for "construct"
-TukeyHSD.group.FUN(mod,"construct", FUN=function(x)x^2)
+#-------------------------------------------------------------------------------
+# data transformation for statistical analysis ? (choose between No transformation, Log transformation or power transformation)
+trans_stat <- function(x) x # No transformation (raw data)
+# trans_stat <- function(x) x^0.5 # Power Transformation (^0.5 = square root)
+# trans_stat <- log10 # Log Transformation
 
-# Multiple comparisons AOV test for construct.rep (choose between No transformation, Log transformation or power transformation)
-#mod <- aov(surface~construct.rep,data=df4)
-#mod <- aov(log(surface)~construct.rep,data=df4)
-mod <- aov(surface^0.5~construct.rep,data=df4)
+conf.level=0.95 #confidence interval (0.95 for alpha = 0.05)
+
+
+#-------------------------------------------------------------------------------
+# Multiple comparisons AOV test for construct 
+mod <- aov(trans_stat(surface)~construct+construct:rep,data=df4)
 anova(mod)
+model.tables(mod,type="means",cterms="construct") #check model
 
-# Tukey HSD test and grouping for "construct.rep"
-TukeyHSD.group.FUN(mod,"construct.rep",hole.rm=TRUE, FUN=function(x)x^2)
-
-
-
+# Tukey HSD test and grouping for "construct".
+TukeyHSD.group.FUN(mod,"construct",hole.rm=TRUE, FUN=trans_stat, conf.level=conf.level)
 
 # extract p.adj values for "construct" to csv file
-mod <- aov(surface^0.5~construct,data=df4)
-anova(mod)
-mt <- model.tables(mod,type="means",cterms="construct")
-tuk <- TukeyHSD(mod,"construct",ordered=FALSE)
+tuk <- TukeyHSD(mod,"construct",ordered=FALSE, conf.level=conf.level)
 res <- data.frame(tuk$"construct")
 res["p.adj"]
 write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
 
-
 # If transformation applied, export p-values for transformed values to csv file
-if (all(df4$surface == trans(df4$surface)) != TRUE) {
+if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
   print("export adjusted p-values for transformed data")
-  mod <- aov(trans(surface)^0.5~construct,data=df4)
+  mod <- aov(trans_stat(surface)~construct+construct:rep,data=df4)
   anova(mod)
-  mt <- model.tables(mod,type="means",cterms="construct")
-  tuk <- TukeyHSD(mod,"construct",ordered=FALSE)
+  model.tables(mod, type="means",cterms="construct")
+  tuk <- TukeyHSD(mod,"construct",ordered=FALSE, conf.level=conf.level)
   res <- data.frame(tuk$"construct")
   res["p.adj"]
   write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_trans.csv"))
-  
-}
+  }
 
 
+#-------------------------------------------------------------------------------
+# Multiple comparisons AOV test for construct.rep 
+mod <- aov(trans_stat(surface)~construct.rep,data=df4)
+anova(mod)
+model.tables(mod,type="means",cterms="construct.rep") #check model
 
+# Tukey HSD test and grouping for "construct".
+TukeyHSD.group.FUN(mod,"construct.rep",hole.rm=TRUE, FUN=trans_stat, conf.level=conf.level)
 
+# extract p.adj values for "construct" to csv file
+tuk <- TukeyHSD(mod,"construct.rep",ordered=FALSE, conf.level=conf.level)
+res <- data.frame(tuk$"construct.rep")
+res["p.adj"]
+write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
 
-
-
-
-
+# If transformation applied, export p-values for transformed values to csv file
+if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
+  print("export adjusted p-values for transformed data")
+  mod <- aov(trans_stat(surface)~construct.rep,data=df4)
+  anova(mod)
+  model.tables(mod, type="means",cterms="construct.rep")
+  tuk <- TukeyHSD(mod,"construct.rep",ordered=FALSE, conf.level=conf.level)
+  res <- data.frame(tuk$"construct.rep")
+  res["p.adj"]
+  write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_trans.csv"))
+  }
 
 
 ## --------------- End of multiple comparisons ------------------
+
+
+
+
+
+
+
 
 ## ----Optional tests ----------------------------------------------------
 
