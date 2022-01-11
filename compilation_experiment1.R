@@ -334,8 +334,8 @@ TukeyHSD.group.FUN(mod,"construct",hole.rm=TRUE, FUN=trans_stat, conf.level=conf
 # extract p.adj values for "construct" to csv file
 tuk <- TukeyHSD(mod,"construct",ordered=FALSE, conf.level=conf.level)
 res <- data.frame(tuk$"construct")
-res["p.adj"]
-write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
+res
+write.csv2(res, file=file.path(outfolder,"p_adjusted_construct.csv"))
 
 # If transformation applied, export p-values for transformed values to csv file
 if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
@@ -345,8 +345,8 @@ if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
   model.tables(mod, type="means",cterms="construct")
   tuk <- TukeyHSD(mod,"construct",ordered=FALSE, conf.level=conf.level)
   res <- data.frame(tuk$"construct")
-  res["p.adj"]
-  write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_trans.csv"))
+  res
+  write.csv2(res, file=file.path(outfolder,"p_adjusted_trans__construct.csv"))
   }
 
 
@@ -363,7 +363,7 @@ TukeyHSD.group.FUN(mod,"construct.rep",hole.rm=TRUE, FUN=trans_stat, conf.level=
 tuk <- TukeyHSD(mod,"construct.rep",ordered=FALSE, conf.level=conf.level)
 res <- data.frame(tuk$"construct.rep")
 res["p.adj"]
-write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted.csv"))
+write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_construct_rep.csv"))
 
 # If transformation applied, export p-values for transformed values to csv file
 if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
@@ -373,8 +373,8 @@ if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
   model.tables(mod, type="means",cterms="construct.rep")
   tuk <- TukeyHSD(mod,"construct.rep",ordered=FALSE, conf.level=conf.level)
   res <- data.frame(tuk$"construct.rep")
-  res["p.adj"]
-  write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_trans.csv"))
+  res
+  write.csv2(res, file=file.path(outfolder,"p_adjusted_trans_construct_rep.csv"))
   }
 
 
