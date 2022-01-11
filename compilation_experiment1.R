@@ -362,8 +362,8 @@ TukeyHSD.group.FUN(mod,"construct.rep",hole.rm=TRUE, FUN=trans_stat, conf.level=
 # extract p.adj values for "construct" to csv file
 tuk <- TukeyHSD(mod,"construct.rep",ordered=FALSE, conf.level=conf.level)
 res <- data.frame(tuk$"construct.rep")
-res["p.adj"]
-write.csv2(res["p.adj"], file=file.path(outfolder,"p_adjusted_construct_rep.csv"))
+res
+write.csv2(res, file=file.path(outfolder,"p_adjusted_construct_rep.csv"))
 
 # If transformation applied, export p-values for transformed values to csv file
 if (all(df4$surface == trans_stat(df4$surface)) != TRUE) {
